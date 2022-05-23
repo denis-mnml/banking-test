@@ -1,3 +1,14 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+//@import 'tailwind';
+@import 'components/button';
+@import 'components/form';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+.app {
+  @apply flex flex-col max-w-2xl min-h-screen px-5 py-6 mx-auto;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

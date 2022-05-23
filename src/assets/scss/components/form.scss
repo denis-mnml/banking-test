@@ -1,0 +1,9 @@
+.form {
+  &-label {
+    @apply block text-sm font-semibold text-gray-700 mb-2;
+  }
+
+  &-input {
+    @apply h-12 rounded-lg w-full border-gray-200;
+  }
+}
