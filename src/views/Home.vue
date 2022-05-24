@@ -103,7 +103,12 @@
 </script>
 
 <template>
-  <h1 class="text-base tracking-wider text-gray-600 font-bold uppercase text-center mb-5">Make payment</h1>
+  <div class="page-header">
+    <div class="page-header__back">
+      <Menu2Icon />
+    </div>
+    <h1 class="page-heading">Make payment</h1>
+  </div>
   <AppSelect
     class="mb-6"
     :options="contactOptions"
@@ -116,7 +121,7 @@
     </template>
     <template v-slot:selectedView="{ item }">
       <div class="max-w-full overflow-hidden">
-        <div class="font-bold text-gray-900 text-[15px] truncate">
+        <div class="font-bold text-gray-900 text-sm truncate">
           {{ item.title }}
         </div>
         <div class="text-gray-400 text-xs truncate">
@@ -139,7 +144,7 @@
       <router-link :to="{ name: 'PaymentMethods' }" class="text-sm font-semibold text-blue-600"> + Add</router-link>
     </template>
     <template v-slot:selectedView="{ item }">
-      <div class="font-bold text-gray-900 text-[15px]">{{ item.title }}</div>
+      <div class="font-bold text-gray-900 text-sm">{{ item.title }}</div>
       <div class="text-gray-400 text-xs">{{ getCardNumber(item.value) }}</div>
     </template>
     <template v-slot:optionItem="data">
@@ -151,6 +156,6 @@
       />
     </template>
   </AppSelect>
-  <FormInput type="number" label="Enter amount" v-model="form.amount" />
-  <AppButton class="mt-auto w-full" type="primary" :disabled="!form.amount" :loading="isLoading"> Pay</AppButton>
+  <FormInput class="mb-8" type="number" label="Amount" v-model="form.amount" placeholder="Enter amount" />
+  <AppButton class="mt-auto w-full" type="primary" :disabled="!form.amount" :loading="isLoading">Pay</AppButton>
 </template>

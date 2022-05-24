@@ -1,21 +1,8 @@
-<template>
-  <div>
-    <label v-if="label" class="form-label">
-      {{ label }}
-    </label>
-    <input
-      :type="type"
-      class="form-input"
-      :value="modelValue"
-      @input="inputHandler"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
   defineProps<{
     type: string
     label?: string
+    placeholder?: string
     modelValue?: string | number
   }>()
 
@@ -27,3 +14,19 @@
     emit('update:modelValue', (event.target as HTMLInputElement).value)
   }
 </script>
+
+<template>
+  <div>
+    <label v-if="label" class="form-label">
+      {{ label }}
+    </label>
+    <input
+      :type="type"
+      class="form-input"
+      :value="modelValue"
+      :placeholder="placeholder"
+      @input="inputHandler"
+    />
+  </div>
+</template>
+

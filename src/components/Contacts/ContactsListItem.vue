@@ -22,8 +22,8 @@
       <div class="text-gray-400 text-sm">{{ contact.email }}</div>
     </div>
     <div
-      :class="{ 'bg-green-600': slotData.isSelected }"
-      class="flex items-center justify-center h-5 min-w-[1.25rem] basis-5 mt-1 bg-gray-200 text-white rounded-full"
+      :class="slotData.isSelected ? 'bg-green-600' : 'bg-gray-200'"
+      class="flex items-center justify-center h-5 min-w-[1.25rem] basis-5 mt-1 text-white rounded-full"
     >
       <CheckIcon v-if="slotData.isSelected" size="12" />
     </div>

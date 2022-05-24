@@ -1,3 +1,11 @@
+<script setup lang="ts">
+</script>
+
 <template>
-  <h1>Payments Methods</h1>
+  <div class="page-header">
+    <router-link :to="{ name: 'Home' }" class="page-header__back">
+      <ArrowLeftIcon />
+    </router-link>
+    <h1 class="page-heading">Add Payment Method</h1>
+  </div>
 </template>
