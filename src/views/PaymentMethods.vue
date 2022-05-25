@@ -1,11 +1,10 @@
 <script setup lang="ts">
+  import PageHeader from '@/components/Common/PageHeader.vue'
+  import { useRoute } from 'vue-router'
+
+  const route = useRoute()
 </script>
 
 <template>
-  <div class="page-header">
-    <router-link :to="{ name: 'Home' }" class="page-header__back">
-      <ArrowLeftIcon />
-    </router-link>
-    <h1 class="page-heading">Add Payment Method</h1>
-  </div>
+  <PageHeader back-to="/" :title="route.meta.title" />
 </template>

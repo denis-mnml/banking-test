@@ -1,29 +1,49 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     name: 'Home',
     path: '/',
-    meta: { transition: 'open-home-page' },
     component: () => import('@/views/Home.vue'),
+    meta: {
+      transition: 'open-home-page',
+      title: 'Make payment',
+    },
   },
   {
     name: 'Contacts',
     path: '/contacts',
-    meta: { transition: 'open-secondary-page' },
     component: () => import('@/views/Contacts.vue'),
+    meta: {
+      transition: 'open-secondary-page',
+      title: 'Add new contact',
+    },
+  },
+  {
+    name: 'EditContact',
+    path: '/contacts/:id',
+    component: () => import('@/views/Contacts.vue'),
+    meta: {
+      transition: 'open-secondary-page',
+      title: 'Edit contact',
+    },
   },
   {
     name: 'PaymentMethods',
     path: '/payment-methods',
-    meta: { transition: 'open-secondary-page' },
     component: () => import('@/views/PaymentMethods.vue'),
+    meta: {
+      transition: 'open-secondary-page',
+      title: 'Add payment method',
+    },
   },
   // {
   //   path: '*',
   //   redirect: '/',
   // },
 ]
+
+export type RouteNames = 'Home' | 'Contacts' | 'PaymentMethods'
 
 const router = createRouter({
   history: createWebHistory(),

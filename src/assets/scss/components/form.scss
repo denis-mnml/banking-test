@@ -11,5 +11,15 @@ input::placeholder {
 
   &-input {
     @apply h-12 rounded-lg w-full border-gray-200 shadow-sm;
+    &_error {
+      @apply border-red-600;
+    }
+
+    &__help-text {
+      @apply text-xs text-gray-400 mt-1;
+      &_error {
+        @apply text-red-600;
+      }
+    }
   }
 }

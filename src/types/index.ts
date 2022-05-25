@@ -1,3 +1,15 @@
+enum LocalStoragesEnum {
+  payFormDraft,
+  contactFormDraft,
+  cardFormDraft,
+  bankAccountFormDraft,
+  contacts,
+  cards,
+  bankAccounts,
+}
+
+export type LocalStorages = keyof typeof LocalStoragesEnum
+
 export type Contact = {
   id: number
   firstName: string
@@ -19,12 +31,12 @@ export type BankAccount = {
   bsb: string
 }
 
-export type SelectOption = {
+export interface SelectOption {
   title: string
   value: string | number
 }
 
-export type SelectGroupOptions = {
+export interface SelectGroupOptions {
   groupTitle: string
   options: SelectOption[]
 }

@@ -1,11 +1,19 @@
 .btn {
   @apply inline-flex items-center justify-center h-12 px-8 font-semibold rounded-lg;
+  @apply active:scale-[0.99] transition-transform duration-[0.05s];
+  -webkit-tap-highlight-color: transparent;
+
   &:disabled {
     @apply bg-gray-200 text-gray-400;
   }
 
   &_primary {
     @apply text-white bg-blue-500;
-    @apply hover:bg-blue-600 focus:bg-blue-600 active:bg-blue-600;
+    @apply hover:bg-blue-600 focus:bg-blue-500 active:bg-blue-600;
+  }
+
+  &_success {
+    @apply text-white bg-green-500;
+    @apply hover:bg-green-600 focus:bg-green-500 active:bg-green-600;
   }
 }
