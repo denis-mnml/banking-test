@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, ComputedRef, ref } from 'vue'
   import { SelectGroupOptions, SelectOption } from '@/types'
 
   type ValueType = SelectOption['value']
@@ -20,21 +20,22 @@
 
   const localValue = ref(props.modelValue)
   const isShow = ref(false)
+  const isGroupOptions = computed(() => props.options[0] && 'groupTitle' in props.options[0])
 
   const selectedItem = computed(() => {
     if (!localValue.value) return
 
-    if ('groupTitle' in props.options[0]) {
+    if (isGroupOptions.value) {
       return props.options
                   .flatMap((item) => (item as SelectGroupOptions).options)
                   .find((item) => item.value === localValue.value)
     } else {
       return props.options.find((item) => (item as SelectOption).value === localValue.value)
     }
-  })
+  }) as ComputedRef<SelectOption | undefined>
 
   const isEmptyOptions = computed(() => {
-    if ('groupTitle' in props.options[0]) {
+    if (isGroupOptions.value) {
       return props.options.flatMap((item) => (item as SelectGroupOptions).options).length === 0
     }
 
@@ -57,6 +58,11 @@
     emit('change', value)
     close()
   }
+
+  function beforeLeave(el: HTMLElement) {
+    console.log('beforeLeave', el)
+    el.style.height = el.offsetHeight + 'px'
+  }
 </script>
 
 <template>
@@ -77,7 +83,7 @@
     <div v-if="helpText" class="select__help-text" :class="{ 'select__help-text_error': error }">
       {{ helpText }}
     </div>
-    <transition name="drawer-fade">
+    <Transition name="drawer-fade">
       <div class="fixed inset-0" v-if="isShow">
         <div class="absolute inset-0 bg-gray-900/40" @click="close"></div>
         <div class="select__drawer drawer">
@@ -88,29 +94,40 @@
               <XIcon size="20" class="-my-1 text-gray-400" @click="close" />
             </div>
             <div class="drawer__content no-scrollbar">
-              <div class="drawer__list" v-for="(item, index) in options" :key="item.value">
-                <template v-if="item.groupTitle">
+              <template v-if="isGroupOptions">
+                <ul class="drawer__list" v-for="(item, index) in options" :key="item.value">
                   <template v-if="item.options.length">
-                    <div class="drawer__list-title" :class="{ 'mt-8': index !== 0 }">
-                      {{ item.groupTitle }}
-                    </div>
-                    <div v-for="(_item, _index) in item.options" :key="_item.value" @click="select(_item.value)">
-                      <slot
-                        name="optionItem"
-                        :item="_item"
-                        :is-selected="localValue === _item.value"
-                        :is-first="_index === 0"
-                        :is-last="options.length === _index + 1"
+                    <li class="drawer__list-title" :class="{ 'mt-8': index !== 0 }">{{ item.groupTitle }}</li>
+                    <TransitionGroup name="delete">
+                      <li
+                        class="drawer__list-item"
+                        v-for="(_item, _index) in item.options"
+                        :key="_item.value"
+                        @click="select(_item.value)"
                       >
-                        <div class="drawer__list-item" :class="{ 'font-bold': localValue === _item.value }">
-                          {{ _item.title }}
-                        </div>
-                      </slot>
-                    </div>
+                        <slot
+                          name="optionItem"
+                          :item="_item"
+                          :is-selected="localValue === _item.value"
+                          :is-first="_index === 0"
+                          :is-last="options.length === _index + 1"
+                        >
+                          <div
+                            class="py-4 text-gray-700 border-b border-b-gray-200"
+                            :class="{ 'font-bold': localValue === _item.value }"
+                          >
+                            {{ _item.title }}
+                          </div>
+                        </slot>
+                      </li>
+                    </TransitionGroup>
                   </template>
-                </template>
-                <template v-else>
-                  <div @click="select(item.value)">
+                </ul>
+              </template>
+              <template v-else>
+                <TransitionGroup tag="ul" class="drawer__list" name="delete" @before-leave="beforeLeave">
+                  <li class="drawer__list-item" v-for="(item, index) in options" :key="item.value"
+                      @click="select(item.value)">
                     <slot
                       name="optionItem"
                       :item="item"
@@ -118,20 +135,25 @@
                       :is-first="index === 0"
                       :is-last="options.length === index + 1"
                     >
-                      <div class="drawer__list-item" :class="{ 'font-bold': localValue === item.value }">
+                      <div
+                        class="py-4 text-gray-700 border-b border-b-gray-200"
+                        :class="{ 'font-bold': localValue === item.value }"
+                      >
                         {{ item.title }}
                       </div>
                     </slot>
-                  </div>
-                </template>
-              </div>
-              <slot v-if="isEmptyOptions" name="empty">
-                <div class="pt-6 mb-4 text-gray-400 text-center">No items</div>
-              </slot>
+                  </li>
+                </TransitionGroup>
+              </template>
+              <Transition name="fade">
+                <slot v-if="isEmptyOptions" name="empty">
+                  <div class="pt-6 mb-4 text-gray-400 text-center">No items</div>
+                </slot>
+              </Transition>
             </div>
           </div>
         </div>
       </div>
-    </transition>
+    </Transition>
   </div>
 </template>

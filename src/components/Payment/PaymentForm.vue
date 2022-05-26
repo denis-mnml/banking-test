@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import useLocalStorage from '@/hooks/useLocalStorage'
   import { BankAccount, Card, Contact, SelectGroupOptions, SelectOption } from '@/types'
   import { getProtectedCardNumber } from '@/utils'
@@ -12,9 +12,9 @@
   import * as yup from 'yup'
 
   type PayFormValues = {
-    amount: number
     recipient: number
     method: number
+    amount: number
   }
 
   const isLoading = ref(false)
@@ -22,10 +22,8 @@
   const { storage: contacts } = useLocalStorage<Contact[]>('contacts', [])
   const { storage: cards } = useLocalStorage<Card[]>('cards', [])
   const { storage: bankAccounts } = useLocalStorage<BankAccount[]>('bankAccounts', [])
-  const {
-    storage: payFormDraft,
-    destroyStorage: destroyPayFormDraft
-  } = useLocalStorage<Partial<PayFormValues>>('payFormDraft')
+  const { storage: payFormDraft, destroyStorage: destroyPayFormDraft } =
+    useLocalStorage<Partial<PayFormValues>>('payFormDraft')
 
   const { handleSubmit, handleReset } = useForm({
     initialValues: {
@@ -34,11 +32,11 @@
     validationSchema: yup.object({
       recipient: yup.number().required().label('Last name'),
       method: yup.number().required().label('Payment method'),
-      amount: yup.number().required().label('Amount')
+      amount: yup.number().typeError('Amount is a required field').required().label('Amount')
     })
   })
 
-  const { value: recipient, errorMessage: recipientError } = useField('recipient')
+  const { value: recipient, errorMessage: recipientError, setValue: setRecipient } = useField('recipient')
   const { value: method, errorMessage: methodError } = useField('method')
   const { value: amount, errorMessage: amountError } = useField('amount')
 
@@ -50,21 +48,17 @@
   const onInput = (e: InputEvent) => {
     const name = (e.target as HTMLInputElement).name as keyof PayFormValues
     const value = parseInt((e.target as HTMLInputElement).value)
-    console.log('onInput', name, value)
     payFormDraft[name] = value
   }
 
   const onChangeSelect = (value: number, name: keyof PayFormValues) => {
-    if (value) {
-      console.log('onChangeSelect', name, value)
-      payFormDraft[name] = value
-    }
+    if (value) payFormDraft[name] = value
   }
 
-  const contactOptions: SelectOption[] = contacts.map((item) => ({
+  const contactOptions = computed<SelectOption[]>(() => contacts.map((item) => ({
     title: `${item.firstName} ${item.lastName}`,
     value: item.id
-  }))
+  })))
 
   const paymentOptions: SelectGroupOptions[] = [
     {
@@ -80,8 +74,16 @@
     }
   ]
 
-  function removeItem(type: string, id: string) {
-    console.log('Remove Item', type, id)
+  function removeItem(type: string, id: number) {
+    if (type === 'contact') {
+      const idx = contacts.findIndex((item) => item.id === id)
+      if (idx !== -1) contacts.splice(idx, 1)
+
+      if (payFormDraft.recipient === id) {
+        delete payFormDraft.recipient
+        setRecipient(undefined)
+      }
+    }
   }
 
   function getItemById<T extends { id: number }>(items: T[], id: number) {
@@ -125,7 +127,11 @@
         </div>
       </template>
       <template v-slot:optionItem="data">
-        <ContactsListItem :slot-data="data" :contact="getItemById(contacts, data.item.value)" />
+        <ContactsListItem
+          :slot-data="data"
+          :contact="getItemById(contacts, data.item.value)"
+          @delete="(id) => removeItem('contact', id)"
+        />
       </template>
       <template #empty>
         <div class="my-6 text-center">
@@ -162,7 +168,8 @@
       <template #empty>
         <div class="my-6 text-center">
           <div class="text-gray-400 text-sm mb-1">You don't have any payments methods yet</div>
-          <router-link to="/payment-methods" class="font-medium text-blue-600 underline">Add payment method
+          <router-link to="/payment-methods" class="font-medium text-blue-600 underline">
+            Add payment method
           </router-link>
         </div>
       </template>
@@ -177,8 +184,6 @@
       :help-text="amountError"
       v-model="amount"
     />
-    <AppButton class="mt-auto w-full" html-type="submit" type="primary" :loading="isLoading">
-      Pay
-    </AppButton>
+    <AppButton class="mt-auto w-full" html-type="submit" type="primary" :loading="isLoading"> Pay</AppButton>
   </form>
 </template>

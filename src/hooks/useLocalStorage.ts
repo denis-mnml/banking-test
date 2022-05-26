@@ -1,51 +1,44 @@
-import { ref } from 'vue'
+import { computed, reactive, Ref, ref, UnwrapNestedRefs, UnwrapRef, watch } from 'vue'
 import { isEmpty as checkIsEmpty } from '@/utils'
 import { LocalStorages } from '@/types'
 
 interface ReturnValues<T> {
-  storage: T
-  isEmptyStorage: boolean
+  storage: UnwrapNestedRefs<T>
+  isEmptyStorage: Ref<boolean>
   destroyStorage: () => void
 }
 
-export default function useLocalStorage<T>(key: LocalStorages, initialValue = {}): ReturnValues<T> {
-  const storageValue = localStorage.getItem(key)
-  let storage = createProxy(storageValue !== null ? JSON.parse(storageValue) : initialValue)
-  const isEmpty = ref(checkIsEmpty(storageValue))
+export default function useLocalStorage<T extends {} | []>(key: LocalStorages, initialValue?: any): ReturnValues<T> {
+  const localStorageValue = localStorage.getItem(key)
+  let storage = reactive<T>(localStorageValue !== null ? JSON.parse(localStorageValue) : initialValue || {})
+  const isEmpty = computed(() => checkIsEmpty(storage))
+
+  console.log(`storage: ${key}`, storage)
+
+  watch(storage, (val, old) => {
+    console.log('WATCH STORAGE', val, storage)
+    if (val) {
+      localStorage.setItem(key, JSON.stringify(storage))
+    } else if (old && !val) {
+      localStorage.setItem(key, JSON.stringify(storage))
+    }
+  })
 
   function destroyStorage() {
-    storage = createProxy(initialValue)
-    isEmpty.value = true
+    if (Array.isArray(storage)) {
+      storage.splice(0, 0)
+    } else {
+      Object.keys(storage).forEach((key) => {
+        // @ts-ignore
+        delete storage[key]
+      })
+    }
     localStorage.removeItem(key)
-  }
-
-  function createProxy(initValue: any) {
-    console.log(`createProxy: ${key}`, initValue)
-    return new Proxy(initValue, {
-      set(target, prop, val) {
-        if (checkIsEmpty(target)) isEmpty.value = false
-
-        target[prop] = val
-        console.log('SET', val)
-        console.log('TARGET', target)
-        localStorage.setItem(key, JSON.stringify(target))
-
-        return true
-      },
-      deleteProperty(target, prop) {
-        delete target[prop]
-        localStorage.setItem(key, JSON.stringify(target))
-
-        if (!checkIsEmpty(target)) isEmpty.value = true
-
-        return true
-      },
-    })
   }
 
   return {
     storage,
-    isEmptyStorage: isEmpty.value,
+    isEmptyStorage: isEmpty,
     destroyStorage,
   }
 }

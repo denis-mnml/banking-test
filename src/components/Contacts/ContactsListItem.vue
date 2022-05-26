@@ -1,6 +1,9 @@
 <script setup lang="ts">
-  import { Contact, SelectOption } from '@/types'
   import { useRouter } from 'vue-router'
+  import { Contact, SelectOption } from '@/types'
+  import Dropdown from '@/components/Ui/Dropdown.vue'
+  import DropdownItem from '@/components/Ui/DropdownItem.vue'
+  import { ref } from 'vue'
 
   const props = defineProps<{
     slotData: {
@@ -12,16 +15,17 @@
     contact: Contact
   }>()
 
-  const router = useRouter()
+  const emit = defineEmits<{
+    (e: 'delete', value: number): void
+  }>()
 
-  function editContact() {
-    router.push({
-      name: 'EditContact',
-      params: {
-        id: props.contact.id
-      }
-    })
-  }
+  const router = useRouter()
+  const to = ref({
+    name: 'EditContact',
+    params: {
+      id: props.contact.id
+    }
+  })
 </script>
 
 <template>
@@ -39,6 +43,14 @@
       <div class="font-bold text-gray-800">{{ slotData.item.title }}</div>
       <div class="text-gray-400 text-sm">{{ contact.email }}</div>
     </div>
-    <DotsVerticalIcon size="20" class="mt-1 ml-auto text-gray-400" @click.stop="editContact" />
+    <Dropdown class="mt-1 ml-auto">
+      <template #trigger>
+        <DotsVerticalIcon size="20" class="text-gray-400" />
+      </template>
+      <template #menu>
+        <DropdownItem :to="to">Edit</DropdownItem>
+        <DropdownItem @click="emit('delete', contact.id)">Delete</DropdownItem>
+      </template>
+    </Dropdown>
   </div>
 </template>
