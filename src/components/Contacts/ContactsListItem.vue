@@ -4,6 +4,7 @@
   import Dropdown from '@/components/Ui/Dropdown.vue'
   import DropdownItem from '@/components/Ui/DropdownItem.vue'
   import { ref } from 'vue'
+  import { useContactsStore } from '@/stores'
 
   const props = defineProps<{
     slotData: {
@@ -18,6 +19,16 @@
   const emit = defineEmits<{
     (e: 'delete', value: number): void
   }>()
+
+  const { storage: contactsStorage } = useContactsStore()
+
+  function removeItem() {
+    const idx = contactsStorage.findIndex((item) => item.id === props.contact.id)
+    if (idx !== -1) {
+      contactsStorage.splice(idx, 1)
+      emit('delete', props.contact.id)
+    }
+  }
 
   const router = useRouter()
   const to = ref({
@@ -49,7 +60,7 @@
       </template>
       <template #menu>
         <DropdownItem :to="to">Edit</DropdownItem>
-        <DropdownItem @click="emit('delete', contact.id)">Delete</DropdownItem>
+        <DropdownItem @click="removeItem">Delete</DropdownItem>
       </template>
     </Dropdown>
   </div>

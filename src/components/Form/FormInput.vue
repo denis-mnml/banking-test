@@ -1,20 +1,55 @@
 <script setup lang="ts">
-  defineProps<{
+  import StringMask from 'string-mask'
+  import { computed } from 'vue'
+
+  const maskTypes = {
+    expiry: '00/00',
+    card: '0000 0000 0000 0000',
+    bsb: '000-000'
+  }
+
+  const removeFromMask = {
+    expiry: '/',
+    card: ' ',
+    bsb: '-'
+  }
+
+  const props = defineProps<{
     type?: string
+    inputmode?: string
     label?: string
     name: string
     placeholder?: string
     modelValue?: string | number
+    value?: any
     error?: boolean
     helpText?: string
+    mask?: keyof typeof maskTypes
   }>()
+
+  const localValue = computed(() => {
+    console.log('computed', props.value || props.modelValue)
+    return maskValue(props.value || props.modelValue)
+  })
 
   const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void
+    (e: 'input', value: string): void
   }>()
 
+  function maskValue(value: string) {
+    if (value && props.mask) {
+      value = value.slice(0, maskTypes[props.mask].length).replaceAll(removeFromMask[props.mask], '')
+      value = StringMask.apply(value, maskTypes[props.mask])
+    }
+
+    return value
+  }
+
   function inputHandler(event: Event) {
-    emit('update:modelValue', (event.target as HTMLInputElement).value)
+    const value = (event.target as HTMLInputElement).value
+    emit('update:modelValue', value)
+    emit('input', value)
   }
 </script>
 
@@ -23,10 +58,12 @@
     <label v-if="label" class="form-label">{{ label }}</label>
     <input
       :type="type || 'text'"
+      :inputmode="inputmode"
       class="form-input"
       :class="{ 'form-input_error': error }"
       :name="name"
-      :value="modelValue"
+      :value="localValue"
+      :maxlength="mask && maskTypes[mask].length"
       :placeholder="placeholder"
       @input="inputHandler"
     />

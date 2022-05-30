@@ -1,8 +1,10 @@
 <script setup lang="ts">
-  import { computed } from 'vue'
-  import AppButton from '@/components/Ui/AppButton.vue'
+  import { computed, onMounted, ref } from 'vue'
   import { BankAccount, Card, SelectOption } from '@/types'
   import { getProtectedCardNumber } from '@/utils'
+  import Dropdown from '@/components/Ui/Dropdown.vue'
+  import DropdownItem from '@/components/Ui/DropdownItem.vue'
+  import { useBankAccountsStore, useCardsStore } from '@/stores'
 
   const props = defineProps<{
     slotData: {
@@ -15,13 +17,13 @@
   }>()
 
   const emit = defineEmits<{
-    (e: 'remove', value: number): void
+    (e: 'delete', value: number): void
   }>()
 
-  function remove() {
-    emit('remove', props.card.id)
-  }
+  const { storage: cardsStore } = useCardsStore()
+  const { storage: bankAccountsStore } = useBankAccountsStore()
 
+  const cardType = 'cardNumber' in props.card ? 'card' : 'bankAccount'
   const cardImgSrc = computed(() => {
     let type = 'bank'
 
@@ -33,15 +35,45 @@
 
     return `@/assets/img/${type}.svg`
   })
+
+  const to = ref({
+    name: 'EditPaymentMethod',
+    params: { id: props.card.id }
+  })
+
+
+  function removeItem() {
+    const storage = eval(cardType === 'card' ? 'cardsStore' : 'bankAccountsStore') as Card[] | BankAccount[]
+    const idx = storage.findIndex((item) => item.id === props.card.id)
+    if (idx !== -1) {
+      storage.splice(idx, 1)
+      emit('delete', props.card.id)
+    }
+
+    // if (cardType === 'card') {
+    //   const idx = cardsStore.findIndex((item) => item.id === props.card.id)
+    //   if (idx !== -1) cardsStore.splice(idx, 1)
+    // } else {
+    //   const idx = bankAccountsStore.findIndex((item) => item.id === props.card.id)
+    //   if (idx !== -1) bankAccountsStore.splice(idx, 1)
+    // }
+  }
+
 </script>
 
 <template>
   <div class="w-full p-4 rounded-xl shadow-[0_2px_6px_0_rgba(0,0,0,0.1)]">
     <div class="flex justify-between mb-4">
       <img :src="cardImgSrc" class="block max-w-full h-6" alt="Card type">
-      <AppButton class="!h-6 w-6 -mr-2 !px-0 text-gray-400" @click="remove">
-        <DotsVerticalIcon />
-      </AppButton>
+      <Dropdown class="mt-1 ml-auto">
+        <template #trigger>
+          <DotsVerticalIcon size="20" class="text-gray-400" />
+        </template>
+        <template #menu>
+          <DropdownItem :to="to">Edit</DropdownItem>
+          <DropdownItem @click="removeItem">Delete</DropdownItem>
+        </template>
+      </Dropdown>
     </div>
     <div class="flex items-center mb-2">
       <div

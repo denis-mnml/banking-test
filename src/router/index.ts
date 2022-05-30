@@ -37,6 +37,15 @@ const routes: RouteRecordRaw[] = [
       title: 'Add payment method',
     },
   },
+  {
+    name: 'EditPaymentMethod',
+    path: '/payment-methods/:id',
+    component: () => import('@/views/PaymentMethods.vue'),
+    meta: {
+      transition: 'open-secondary-page',
+      title: 'Edit payment method',
+    },
+  },
   // {
   //   path: '*',
   //   redirect: '/',

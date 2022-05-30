@@ -1,15 +1,16 @@
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+  import { computed, ref, watch } from 'vue'
   import useLocalStorage from '@/hooks/useLocalStorage'
   import { BankAccount, Card, Contact, SelectGroupOptions, SelectOption } from '@/types'
   import { getProtectedCardNumber } from '@/utils'
   import FormInput from '@/components/Form/FormInput.vue'
   import AppButton from '@/components/Ui/AppButton.vue'
   import AppSelect from '@/components/Ui/AppSelect.vue'
-  import PaymentMethodListItem from '@/components/PaymentMethod/PaymentMethodListItem.vue'
+  import PaymentMethodsListItem from '@/components/PaymentMethods/PaymentMethodsListItem.vue'
   import ContactsListItem from '@/components/Contacts/ContactsListItem.vue'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
+  import { useBankAccountsStore, useCardsStore, useContactsStore } from '@/stores'
 
   type PayFormValues = {
     recipient: number
@@ -19,13 +20,14 @@
 
   const isLoading = ref(false)
 
-  const { storage: contacts } = useLocalStorage<Contact[]>('contacts', [])
-  const { storage: cards } = useLocalStorage<Card[]>('cards', [])
-  const { storage: bankAccounts } = useLocalStorage<BankAccount[]>('bankAccounts', [])
+  const { storage: contactsStore } = useContactsStore()
+  const { storage: cardsStore } = useCardsStore()
+  const { storage: bankAccountsStore } = useBankAccountsStore()
   const { storage: payFormDraft, destroyStorage: destroyPayFormDraft } =
     useLocalStorage<Partial<PayFormValues>>('payFormDraft')
 
-  const { handleSubmit, handleReset } = useForm({
+  // FORM
+  const { handleSubmit, handleReset, setValues } = useForm({
     initialValues: {
       ...payFormDraft
     },
@@ -36,8 +38,8 @@
     })
   })
 
-  const { value: recipient, errorMessage: recipientError, setValue: setRecipient } = useField('recipient')
-  const { value: method, errorMessage: methodError } = useField('method')
+  const { value: recipient, errorMessage: recipientError, resetField: resetRecipient } = useField('recipient')
+  const { value: method, errorMessage: methodError, resetField: resetMethod } = useField('method')
   const { value: amount, errorMessage: amountError } = useField('amount')
 
   const onSubmit = handleSubmit(() => {
@@ -51,38 +53,32 @@
     payFormDraft[name] = value
   }
 
-  const onChangeSelect = (value: number, name: keyof PayFormValues) => {
-    if (value) payFormDraft[name] = value
+  const onChangeSelect = (key: keyof PayFormValues, value: number) => {
+    if (value) payFormDraft[key] = value
   }
 
-  const contactOptions = computed<SelectOption[]>(() => contacts.map((item) => ({
+  const contactOptions = computed<SelectOption[]>(() => contactsStore.map((item) => ({
     title: `${item.firstName} ${item.lastName}`,
     value: item.id
   })))
 
-  const paymentOptions: SelectGroupOptions[] = [
+  const paymentOptions = computed<SelectGroupOptions[]>(() => [
     {
       groupTitle: 'Credit/debit cards',
-      options: cards.map((item) => ({ title: item.fullName, value: item.id }))
+      options: cardsStore.map((item) => ({ title: item.fullName, value: item.id }))
     },
     {
       groupTitle: 'Bank accounts',
-      options: bankAccounts.map((item) => ({
-        title: item.accountName,
-        value: item.id
-      }))
+      options: bankAccountsStore.map((item) => ({ title: item.accountName, value: item.id }))
     }
-  ]
+  ])
 
-  function removeItem(type: string, id: number) {
-    if (type === 'contact') {
-      const idx = contacts.findIndex((item) => item.id === id)
-      if (idx !== -1) contacts.splice(idx, 1)
+  function removeItem(type: keyof PayFormValues, id: number) {
+    if (payFormDraft[type] === id) {
+      delete payFormDraft[type]
 
-      if (payFormDraft.recipient === id) {
-        delete payFormDraft.recipient
-        setRecipient(undefined)
-      }
+      if (type === 'recipient') resetRecipient()
+      if (type === 'method') resetMethod()
     }
   }
 
@@ -91,12 +87,12 @@
   }
 
   function getContactEmail(value: number) {
-    const item = getItemById<Contact>(contacts, value) as Contact
+    const item = getItemById<Contact>(contactsStore, value) as Contact
     return item?.email || ''
   }
 
   function getCardNumber(value: number) {
-    const item = getItemById<Card | BankAccount>([...cards, ...bankAccounts], value) as Card
+    const item = getItemById<Card | BankAccount>([...cardsStore, ...bankAccountsStore], value) as Card
     return item ? getProtectedCardNumber(item) : ''
   }
 </script>
@@ -111,7 +107,7 @@
       :error="!!recipientError"
       :help-text="recipientError"
       v-model="recipient"
-      @change="(v) => onChangeSelect(v, 'recipient')"
+      @change="(v) => onChangeSelect('recipient', v)"
     >
       <template #action>
         <router-link :to="{ name: 'Contacts' }" class="text-sm font-semibold text-blue-600"> + Add</router-link>
@@ -129,8 +125,8 @@
       <template v-slot:optionItem="data">
         <ContactsListItem
           :slot-data="data"
-          :contact="getItemById(contacts, data.item.value)"
-          @delete="(id) => removeItem('contact', id)"
+          :contact="getItemById(contactsStore, data.item.value)"
+          @delete="(v) => removeItem('recipient', v)"
         />
       </template>
       <template #empty>
@@ -144,11 +140,11 @@
       class="mb-6"
       :options="paymentOptions"
       label="Payment Method"
-      name="paymentMethod"
       placeholder="Select method"
       :error="!!methodError"
       :help-text="methodError"
       v-model="method"
+      @change="(v) => onChangeSelect('method', v)"
     >
       <template #action>
         <router-link :to="{ name: 'PaymentMethods' }" class="text-sm font-semibold text-blue-600"> + Add</router-link>
@@ -158,11 +154,11 @@
         <div class="text-gray-400 text-xs">{{ getCardNumber(item.value) }}</div>
       </template>
       <template v-slot:optionItem="data">
-        <PaymentMethodListItem
+        <PaymentMethodsListItem
           class="mb-4"
           :slot-data="data"
-          :card="getItemById([...cards, ...bankAccounts], data.item.value)"
-          @remove="removeItem('card', data.item.value)"
+          :card="getItemById([...cardsStore, ...bankAccountsStore], data.item.value)"
+          @delete="(v) => removeItem('method', v)"
         />
       </template>
       <template #empty>

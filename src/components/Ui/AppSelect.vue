@@ -60,7 +60,6 @@
   }
 
   function beforeLeave(el: HTMLElement) {
-    console.log('beforeLeave', el)
     el.style.height = el.offsetHeight + 'px'
   }
 </script>
@@ -98,7 +97,7 @@
                 <ul class="drawer__list" v-for="(item, index) in options" :key="item.value">
                   <template v-if="item.options.length">
                     <li class="drawer__list-title" :class="{ 'mt-8': index !== 0 }">{{ item.groupTitle }}</li>
-                    <TransitionGroup name="delete">
+                    <TransitionGroup name="delete" @before-leave="beforeLeave">
                       <li
                         class="drawer__list-item"
                         v-for="(_item, _index) in item.options"

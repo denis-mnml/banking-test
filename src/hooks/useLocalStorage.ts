@@ -1,4 +1,4 @@
-import { computed, reactive, Ref, ref, UnwrapNestedRefs, UnwrapRef, watch } from 'vue'
+import { computed, reactive, Ref, UnwrapNestedRefs, watch } from 'vue'
 import { isEmpty as checkIsEmpty } from '@/utils'
 import { LocalStorages } from '@/types'
 
@@ -10,7 +10,7 @@ interface ReturnValues<T> {
 
 export default function useLocalStorage<T extends {} | []>(key: LocalStorages, initialValue?: any): ReturnValues<T> {
   const localStorageValue = localStorage.getItem(key)
-  let storage = reactive<T>(localStorageValue !== null ? JSON.parse(localStorageValue) : initialValue || {})
+  const storage = reactive<T>(localStorageValue !== null ? JSON.parse(localStorageValue) : initialValue || {})
   const isEmpty = computed(() => checkIsEmpty(storage))
 
   console.log(`storage: ${key}`, storage)
@@ -24,7 +24,7 @@ export default function useLocalStorage<T extends {} | []>(key: LocalStorages, i
     }
   })
 
-  function destroyStorage() {
+  function clearStorage() {
     if (Array.isArray(storage)) {
       storage.splice(0, 0)
     } else {
@@ -33,6 +33,10 @@ export default function useLocalStorage<T extends {} | []>(key: LocalStorages, i
         delete storage[key]
       })
     }
+  }
+
+  function destroyStorage() {
+    clearStorage()
     localStorage.removeItem(key)
   }
 

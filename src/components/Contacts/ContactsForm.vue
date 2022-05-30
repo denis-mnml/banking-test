@@ -6,12 +6,10 @@
   import AppButton from '@/components/Ui/AppButton.vue'
   import { useRoute, useRouter } from 'vue-router'
   import { Contact } from '@/types'
+  import { useContactsStore } from '@/stores'
+  import { computed } from 'vue'
 
-  type ContactFormValues = {
-    firstName: string
-    lastName: string
-    email: string
-  }
+  type ContactFormValues = Omit<Contact, 'id'>
 
   const router = useRouter()
   const route = useRoute()
@@ -20,21 +18,20 @@
     storage: contactFormDraft,
     destroyStorage: destroyContactFormDraft
   } = useLocalStorage<Partial<ContactFormValues>>('contactFormDraft')
-  const { storage: contactsStorage } = useLocalStorage<Contact[]>('contacts', [])
+  const { storage: contactsStore } = useContactsStore()
 
-  const contactToEdit = (() => {
+  const contactToEdit = computed(() => {
     if ('id' in route.params) {
-      return contactsStorage.find((item) => item.id === parseInt(route.params.id as string)) || {}
+      return contactsStore.find((item) => item.id === parseInt(route.params.id as string)) || {}
     }
     return {}
-  })()
-
-  const isEdit = Object.keys(contactToEdit).length !== 0
+  })
+  const isEdit = computed(() => Object.keys(contactToEdit.value).length !== 0)
 
   const { handleSubmit, handleReset } = useForm({
     initialValues: {
       ...contactFormDraft,
-      ...contactToEdit
+      ...contactToEdit.value
     },
     validationSchema: yup.object({
       firstName: yup.string().required().max(30).label('First name'),
@@ -48,18 +45,18 @@
   const { value: email, errorMessage: emailError } = useField('email')
 
   const onSubmit = handleSubmit((values) => {
-    if (isEdit) {
-      const contact = contactToEdit as Contact
-      const idx = contactsStorage.findIndex(item => item.id === contact.id)
+    if (isEdit.value) {
+      const contact = contactToEdit.value as Contact
+      const idx = contactsStore.findIndex(item => item.id === contact.id)
 
       if (idx !== -1) {
-        contactsStorage[idx] = {
+        contactsStore[idx] = {
           ...contact,
           ...values
         }
       }
     } else {
-      contactsStorage.push({
+      contactsStore.push({
         id: Date.now(),
         ...values as ContactFormValues
       })
@@ -70,7 +67,7 @@
   })
 
   const onInput = (e: InputEvent) => {
-    if (!isEdit) {
+    if (!isEdit.value) {
       const name = (e.target as HTMLInputElement).name as keyof ContactFormValues
       contactFormDraft[name] = (e.target as HTMLInputElement).value
     }

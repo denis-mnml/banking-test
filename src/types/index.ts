@@ -20,14 +20,14 @@ export type Contact = {
 export type Card = {
   id: number
   fullName: string
-  cardNumber: number
+  cardNumber: string
   expiryDate: string
 }
 
 export type BankAccount = {
   id: number
   accountName: string
-  accountNumber: number
+  accountNumber: string
   bsb: string
 }
 
