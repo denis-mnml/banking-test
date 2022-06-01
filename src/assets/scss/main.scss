@@ -10,8 +10,9 @@
 @import 'components/select';
 @import 'components/tabs';
 
-
-html, body, #app {
+html,
+body,
+#app {
   height: 100%;
 }
 
@@ -31,9 +32,61 @@ html, body, #app {
 }
 
 .page-heading {
-  @apply text-lg text-white font-semibold ;
+  @apply text-lg text-white font-semibold;
 }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+.success {
+  @apply flex items-center justify-center w-28 h-28 rounded-full overflow-hidden;
+  @apply border-4 border-transparent border-r-green-500;
+  animation: stroke 1.5s cubic-bezier(0.78, 0.29, 0.35, 0.86) forwards, scale 0.4s ease-in-out 1.35s,
+    fill 0.4s ease-in-out 1.35s forwards;
+  &__icon {
+    @apply text-white;
+  }
+}
+
+@keyframes stroke {
+  0% {
+    transform: rotate(0);
+  }
+  25% {
+    @apply border-t-transparent;
+  }
+  50% {
+    @apply border-l-transparent border-t-green-500;
+  }
+  75% {
+    @apply border-l-green-500 border-b-transparent;
+  }
+  95% {
+    @apply border-b-green-500;
+  }
+  100% {
+    @apply border-b-green-500 border-t-green-500 border-l-green-500;
+    transform: rotate(720deg);
+  }
+}
+
+@keyframes scale {
+  0% {
+    transform: none;
+  }
+
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes fill {
+  100% {
+    @apply bg-green-500;
+  }
 }

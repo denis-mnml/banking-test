@@ -8,13 +8,10 @@
 </script>
 
 <template>
-  <PageHeader title="Make Payment">
-    <template #backBtn>
-      <Menu2Icon />
-    </template>
-  </PageHeader>
   <div class="mt-16">
-    <CircleCheckIcon size="120" class="text-green-500 mx-auto mb-4" />
+    <div class="success mx-auto mb-4">
+      <CheckIcon class="success__icon" size="56" />
+    </div>
     <div class="text-xl text-gray-700 font-medium text-center">Payment completed successfully</div>
   </div>
   <router-link to="/" class="btn btn_primary mt-auto">Make another one</router-link>

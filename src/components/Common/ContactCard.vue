@@ -48,7 +48,7 @@
       <CheckIcon v-if="slotData.isSelected" size="12" />
     </div>
     <div>
-      <div class="font-bold text-gray-800">{{ slotData.item.title }}</div>
+      <div class="font-bold text-gray-800 truncate">{{ slotData.item.title }}</div>
       <div class="text-gray-400 text-sm">{{ contact.email }}</div>
     </div>
     <AppDropdown class="mt-1 ml-auto">

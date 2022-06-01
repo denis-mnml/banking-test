@@ -69,8 +69,10 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from) => {
-  if (to.name === 'Home' && from.name === 'Thanks') {
-    to.meta.transition = 'page-slide-top'
+  if (!from.name) {
+    to.meta.transition = null
+  } else if (to.name === 'Home' && from.name === 'Thanks') {
+    to.meta.transition = 'page-slide-bottom'
   }
 
   if (to.name === 'Thanks' && !to.query.order) {

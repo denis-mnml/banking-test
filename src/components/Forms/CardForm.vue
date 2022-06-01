@@ -70,7 +70,6 @@
   const { value: expiryDate, errorMessage: expiryDateError } = useField<string | undefined>('expiryDate')
 
   const onSubmit = handleSubmit((values) => {
-    console.log('Add card', values, isEdit.value)
     if (isEdit.value) {
       const card = cardToEdit.value as Card
       const idx = cardsStore.findIndex((item) => item.id === card.id)

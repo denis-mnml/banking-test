@@ -1,10 +1,10 @@
 <script setup lang="ts">
-  import { computed, onMounted, ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { BankAccount, Card, SelectOption } from '@/types'
+  import { useBankAccountsStore, useCardsStore } from '@/stores'
   import { getProtectedCardNumber } from '@/utils'
   import AppDropdown from '@/components/Ui/AppDropdown.vue'
   import AppDropdownItem from '@/components/Ui/AppDropdownItem.vue'
-  import { useBankAccountsStore, useCardsStore } from '@/stores'
 
   const props = defineProps<{
     slotData: {
@@ -24,14 +24,12 @@
   const { storage: bankAccountsStore } = useBankAccountsStore()
 
   const cardType = 'cardNumber' in props.card ? 'card' : 'bankAccount'
-  const cardNumber = 'fullName' in props.card ? props.card.fullName : props.card.accountName
+  const cardName = 'fullName' in props.card ? props.card.fullName : props.card.accountName
   const cardExpiry = 'expiryDate' in props.card ? props.card.expiryDate : ''
   const cardImgSrc = computed(() => {
     let type = 'https://cdn.worldvectorlogo.com/logos/bank-mandiri.svg'
 
     if ('cardNumber' in props.card) {
-      console.log(props.card.cardNumber.toString())
-      console.log(props.card.cardNumber.toString().charAt(0))
       type =
         Number(props.card.cardNumber.toString().charAt(0)) > 5
           ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/772px-Mastercard-logo.svg.png'
@@ -78,7 +76,7 @@
       >
         <CheckIcon v-if="slotData.isSelected" size="12" />
       </div>
-      <div class="font-bold text-gray-800">{{ cardNumber }}</div>
+      <div class="font-bold text-gray-800 truncate">{{ cardName }}</div>
     </div>
     <div class="flex justify-between">
       <div class="text-gray-400 text-sm">{{ getProtectedCardNumber(card) }}</div>

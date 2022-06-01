@@ -53,8 +53,8 @@
 
     setTimeout(() => {
       router.push({ name: 'Thanks', query: { order: 261572 } })
-      handleReset()
       destroyPayFormDraft()
+      handleReset()
     }, 2000)
   })
 

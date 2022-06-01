@@ -13,10 +13,7 @@ export default function useLocalStorage<T extends {} | []>(key: LocalStorages, i
   const storage = reactive<T>(localStorageValue !== null ? JSON.parse(localStorageValue) : initialValue || {})
   const isEmpty = computed(() => checkIsEmpty(storage))
 
-  console.log(`storage: ${key}`, storage)
-
   watch(storage, (val, old) => {
-    console.log('WATCH STORAGE', val, storage)
     if (val) {
       localStorage.setItem(key, JSON.stringify(storage))
     } else if (old && !val) {
