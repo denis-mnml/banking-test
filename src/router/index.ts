@@ -1,12 +1,14 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
+export type RouteNames = 'Home' | 'Contacts' | 'PaymentMethods' | 'Thanks'
+
 const routes: RouteRecordRaw[] = [
   {
     name: 'Home',
     path: '/',
     component: () => import('@/views/Home.vue'),
     meta: {
-      transition: 'open-home-page',
+      transition: 'page-slide-left',
       title: 'Make payment',
     },
   },
@@ -15,7 +17,7 @@ const routes: RouteRecordRaw[] = [
     path: '/contacts',
     component: () => import('@/views/Contacts.vue'),
     meta: {
-      transition: 'open-secondary-page',
+      transition: 'page-slide-right',
       title: 'Add new contact',
     },
   },
@@ -24,7 +26,7 @@ const routes: RouteRecordRaw[] = [
     path: '/contacts/:id',
     component: () => import('@/views/Contacts.vue'),
     meta: {
-      transition: 'open-secondary-page',
+      transition: 'page-slide-right',
       title: 'Edit contact',
     },
   },
@@ -33,7 +35,7 @@ const routes: RouteRecordRaw[] = [
     path: '/payment-methods',
     component: () => import('@/views/PaymentMethods.vue'),
     meta: {
-      transition: 'open-secondary-page',
+      transition: 'page-slide-right',
       title: 'Add payment method',
     },
   },
@@ -42,21 +44,40 @@ const routes: RouteRecordRaw[] = [
     path: '/payment-methods/:id',
     component: () => import('@/views/PaymentMethods.vue'),
     meta: {
-      transition: 'open-secondary-page',
+      transition: 'page-slide-right',
       title: 'Edit payment method',
     },
   },
-  // {
-  //   path: '*',
-  //   redirect: '/',
-  // },
+  {
+    name: 'Thanks',
+    path: '/thanks',
+    component: () => import('@/views/Thanks.vue'),
+    meta: {
+      transition: 'page-slide-bottom',
+      title: 'Success',
+    },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/',
+  },
 ]
-
-export type RouteNames = 'Home' | 'Contacts' | 'PaymentMethods'
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to, from) => {
+  if (to.name === 'Home' && from.name === 'Thanks') {
+    to.meta.transition = 'page-slide-top'
+  }
+
+  if (to.name === 'Thanks' && !to.query.order) {
+    return { name: 'Home' }
+  }
+
+  return true
 })
 
 export default router

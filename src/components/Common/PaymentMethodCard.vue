@@ -27,13 +27,18 @@
   const cardNumber = 'fullName' in props.card ? props.card.fullName : props.card.accountName
   const cardExpiry = 'expiryDate' in props.card ? props.card.expiryDate : ''
   const cardImgSrc = computed(() => {
-    let type = 'bank'
+    let type = 'https://cdn.worldvectorlogo.com/logos/bank-mandiri.svg'
 
     if ('cardNumber' in props.card) {
-      type = parseInt(props.card.cardNumber.toString().charAt(0)) > 5 ? 'mastercard' : 'visa'
+      console.log(props.card.cardNumber.toString())
+      console.log(props.card.cardNumber.toString().charAt(0))
+      type =
+        Number(props.card.cardNumber.toString().charAt(0)) > 5
+          ? 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/772px-Mastercard-logo.svg.png'
+          : 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/800px-Visa_Inc._logo.svg.png?20170118154621'
     }
 
-    return `@/assets/img/${type}.svg`
+    return type
   })
 
   const to = ref({
@@ -54,8 +59,8 @@
 
 <template>
   <div class="w-full p-4 rounded-xl shadow-[0_2px_6px_0_rgba(0,0,0,0.1)]">
-    <div class="flex justify-between mb-4">
-      <img :src="cardImgSrc" class="block max-w-full h-6" alt="Card type" />
+    <div class="flex justify-between mb-2">
+      <img :src="cardImgSrc" class="block max-w-full h-4" alt="Card type" />
       <AppDropdown class="mt-1 ml-auto">
         <template #trigger>
           <DotsVerticalIcon size="20" class="text-gray-400" />

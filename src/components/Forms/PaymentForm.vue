@@ -11,6 +11,7 @@
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useBankAccountsStore, useCardsStore, useContactsStore } from '@/stores'
+  import { useRouter } from 'vue-router'
 
   type PayFormValues = {
     recipient: number
@@ -18,6 +19,7 @@
     amount: number
   }
 
+  const router = useRouter()
   const isLoading = ref(false)
 
   const { storage: contactsStore } = useContactsStore()
@@ -47,8 +49,13 @@
   const { value: amount, errorMessage: amountError } = useField<number | undefined>('amount')
 
   const onSubmit = handleSubmit(() => {
-    handleReset()
-    destroyPayFormDraft()
+    isLoading.value = true
+
+    setTimeout(() => {
+      router.push({ name: 'Thanks', query: { order: 261572 } })
+      handleReset()
+      destroyPayFormDraft()
+    }, 2000)
   })
 
   const onInput = (e: Event) => {

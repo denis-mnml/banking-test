@@ -4,16 +4,39 @@
   -webkit-tap-highlight-color: transparent;
 
   &:disabled {
-    @apply bg-gray-200 text-gray-400;
+    @apply bg-gray-200 text-gray-400 pointer-events-none;
   }
 
   &_primary {
     @apply text-white bg-blue-500;
-    @apply hover:bg-blue-600 focus:bg-blue-500 active:bg-blue-600;
+    &:not(:disabled) {
+      @apply hover:bg-blue-600 focus:bg-blue-500 active:bg-blue-600;
+    }
   }
 
   &_success {
     @apply text-white bg-green-500;
-    @apply hover:bg-green-600 focus:bg-green-500 active:bg-green-600;
+    &:not(:disabled) {
+      @apply hover:bg-green-600 focus:bg-green-500 active:bg-green-600;
+    }
+  }
+
+  &__loader {
+    width: 1.5em;
+    height: 1.5em;
+    border: 3px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: loading 1s linear infinite;
+  }
+}
+
+@keyframes loading {
+  from {
+    transform: rotate(0);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }

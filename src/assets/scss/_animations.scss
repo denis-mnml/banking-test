@@ -16,11 +16,66 @@
   }
 }
 
-
-.open-home-page {
+.page-slide-top {
   &-enter-active,
   &-leave-active {
-    transition: transform .25s ease;
+    transition: transform 0.35s ease;
+  }
+
+  &-leave-active {
+    position: absolute;
+    z-index: 1;
+  }
+
+  &-leave-from {
+    transform: translateY(0);
+  }
+
+  &-leave-to {
+    transform: translateY(100%);
+  }
+
+  &-enter-from {
+    transform: translateY(-100px);
+  }
+
+  &-enter-to {
+    transform: translateY(0);
+  }
+}
+
+.page-slide-bottom {
+  &-enter-active,
+  &-leave-active {
+    transition: transform 0.35s ease;
+  }
+
+  &-enter-active {
+    position: absolute;
+    top: 0;
+  }
+
+  &-enter-from {
+    transform: translateY(100%);
+  }
+
+  &-enter-to {
+    transform: translateY(0);
+  }
+
+  &-leave-from {
+    transform: translateY(0);
+  }
+
+  &-leave-to {
+    transform: translateY(-100px);
+  }
+}
+
+.page-slide-left {
+  &-enter-active,
+  &-leave-active {
+    transition: transform 0.25s ease;
   }
 
   &-leave-active {
@@ -45,17 +100,15 @@
   }
 }
 
-
-.open-secondary-page {
+.page-slide-right {
   &-enter-active,
   &-leave-active {
-    transition: transform .25s ease;
+    transition: transform 0.25s ease;
   }
 
   &-enter-active {
     position: absolute;
     top: 0;
-    //z-index: 1000;
   }
 
   &-enter-from {
@@ -78,7 +131,7 @@
 .roll {
   &-enter-active,
   &-leave-active {
-    transition: transform .1s ease;
+    transition: transform 0.1s ease;
     transform-origin: top right;
   }
 
@@ -92,7 +145,7 @@
   &-move,
   &-enter-active,
   &-leave-active {
-    transition: transform .25s ease, height .125s .125s ease, opacity .25s ease;
+    transition: transform 0.25s ease, height 0.125s 0.125s ease, opacity 0.25s ease;
 
     .dropdown__menu {
       display: none;
@@ -122,7 +175,7 @@
 .slide-left {
   &-enter-active,
   &-leave-active {
-    transition: all .25s ease;
+    transition: all 0.25s ease;
   }
 
   &-leave-active {
@@ -155,7 +208,7 @@
 .slide-right {
   &-enter-active,
   &-leave-active {
-    transition: all .25s ease;
+    transition: all 0.25s ease;
   }
 
   &-leave-active {
@@ -184,4 +237,3 @@
     opacity: 0;
   }
 }
-
