@@ -2,7 +2,7 @@
   import useLocalStorage from '@/hooks/useLocalStorage'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
-  import FormInput from '@/components/Form/FormInput.vue'
+  import AppInput from '@/components/Ui/AppInput.vue'
   import AppButton from '@/components/Ui/AppButton.vue'
   import { useRoute, useRouter } from 'vue-router'
   import { Contact } from '@/types'
@@ -14,10 +14,8 @@
   const router = useRouter()
   const route = useRoute()
 
-  const {
-    storage: contactFormDraft,
-    destroyStorage: destroyContactFormDraft
-  } = useLocalStorage<Partial<ContactFormValues>>('contactFormDraft')
+  const { storage: contactFormDraft, destroyStorage: destroyContactFormDraft } =
+    useLocalStorage<Partial<ContactFormValues>>('contactFormDraft')
   const { storage: contactsStore } = useContactsStore()
 
   const contactToEdit = computed(() => {
@@ -31,13 +29,13 @@
   const { handleSubmit, handleReset } = useForm({
     initialValues: {
       ...contactFormDraft,
-      ...contactToEdit.value
+      ...contactToEdit.value,
     },
     validationSchema: yup.object({
       firstName: yup.string().required().max(30).label('First name'),
       lastName: yup.string().required().max(30).label('Last name'),
-      email: yup.string().required().email().label('Email')
-    })
+      email: yup.string().required().email().label('Email'),
+    }),
   })
 
   const { value: firstName, errorMessage: firstNameError } = useField<string | undefined>('firstName')
@@ -47,18 +45,18 @@
   const onSubmit = handleSubmit((values) => {
     if (isEdit.value) {
       const contact = contactToEdit.value as Contact
-      const idx = contactsStore.findIndex(item => item.id === contact.id)
+      const idx = contactsStore.findIndex((item) => item.id === contact.id)
 
       if (idx !== -1) {
         contactsStore[idx] = {
           ...contact,
-          ...values
+          ...values,
         }
       }
     } else {
       contactsStore.push({
         id: Date.now(),
-        ...values as ContactFormValues
+        ...(values as ContactFormValues),
       })
     }
 
@@ -79,13 +77,13 @@
   }
 
   defineExpose({
-    resetForm
+    resetForm,
   })
 </script>
 
 <template>
   <form class="flex flex-col grow" @submit.prevent="onSubmit" @input="onInput">
-    <FormInput
+    <AppInput
       class="mb-6"
       label="First Name"
       name="firstName"
@@ -94,7 +92,7 @@
       :help-text="firstNameError"
       v-model="firstName"
     />
-    <FormInput
+    <AppInput
       class="mb-6"
       label="Last Name"
       name="lastName"
@@ -103,7 +101,7 @@
       :help-text="lastNameError"
       v-model="lastName"
     />
-    <FormInput
+    <AppInput
       type="email"
       class="mb-6"
       label="Email"

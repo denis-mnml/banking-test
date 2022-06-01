@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import PageHeader from '@/components/Common/PageHeader.vue'
-  import ContactsForm from '@/components/Contacts/ContactsForm.vue'
+  import ContactsForm from '@/components/Forms/ContactsForm.vue'
   import { ref } from 'vue'
   import { useRoute } from 'vue-router'
 

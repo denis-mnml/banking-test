@@ -19,7 +19,7 @@
   }
 
   &__drawer {
-    @apply absolute bottom-0 inset-x-0 max-h-[80vh] px-5 pb-6 pt-8 rounded-t-2xl bg-white;
+    @apply absolute bottom-0 inset-x-0 max-h-[80vh] px-5 pt-8 rounded-t-2xl bg-white;
     box-shadow: 0 -8px 24px rgb(0 0 0 / 0.05);
   }
 
@@ -45,7 +45,7 @@
   }
 
   &__content {
-    @apply overflow-y-auto max-h-[calc(80vh-4.5rem)] -mx-5 px-5 pb-5;
+    @apply overflow-y-auto max-h-[calc(80vh-4.5rem)] -mx-5 px-5 pb-10;
   }
 
   &__list {
@@ -57,5 +57,4 @@
       @apply w-full;
     }
   }
-
 }

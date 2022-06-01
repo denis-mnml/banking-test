@@ -2,8 +2,8 @@
   import { computed, onMounted, ref } from 'vue'
   import { BankAccount, Card, SelectOption } from '@/types'
   import { getProtectedCardNumber } from '@/utils'
-  import Dropdown from '@/components/Ui/Dropdown.vue'
-  import DropdownItem from '@/components/Ui/DropdownItem.vue'
+  import AppDropdown from '@/components/Ui/AppDropdown.vue'
+  import AppDropdownItem from '@/components/Ui/AppDropdownItem.vue'
   import { useBankAccountsStore, useCardsStore } from '@/stores'
 
   const props = defineProps<{
@@ -39,6 +39,7 @@
   const to = ref({
     name: 'EditPaymentMethod',
     params: { id: props.card.id },
+    ...(cardType === 'bankAccount' ? { query: { tab: 'bank-account' } } : {}),
   })
 
   function removeItem() {
@@ -55,15 +56,15 @@
   <div class="w-full p-4 rounded-xl shadow-[0_2px_6px_0_rgba(0,0,0,0.1)]">
     <div class="flex justify-between mb-4">
       <img :src="cardImgSrc" class="block max-w-full h-6" alt="Card type" />
-      <Dropdown class="mt-1 ml-auto">
+      <AppDropdown class="mt-1 ml-auto">
         <template #trigger>
           <DotsVerticalIcon size="20" class="text-gray-400" />
         </template>
         <template #menu>
-          <DropdownItem :to="to">Edit</DropdownItem>
-          <DropdownItem @click="removeItem">Delete</DropdownItem>
+          <AppDropdownItem :to="to">Edit</AppDropdownItem>
+          <AppDropdownItem @click="removeItem">Delete</AppDropdownItem>
         </template>
-      </Dropdown>
+      </AppDropdown>
     </div>
     <div class="flex items-center mb-2">
       <div

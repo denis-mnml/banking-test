@@ -2,12 +2,12 @@
   import { computed, ref, watch } from 'vue'
   import useLocalStorage from '@/hooks/useLocalStorage'
   import { BankAccount, Card, Contact, SelectGroupOption, SelectOption } from '@/types'
-  import { getProtectedCardNumber } from '@/utils'
-  import FormInput from '@/components/Form/FormInput.vue'
+  import { getProtectedCardNumber, isEmpty } from '@/utils'
+  import AppInput from '@/components/Ui/AppInput.vue'
   import AppButton from '@/components/Ui/AppButton.vue'
   import AppSelect from '@/components/Ui/AppSelect.vue'
-  import PaymentMethodsListItem from '@/components/PaymentMethods/PaymentMethodsListItem.vue'
-  import ContactsListItem from '@/components/Contacts/ContactsListItem.vue'
+  import PaymentMethodCard from '@/components/Common/PaymentMethodCard.vue'
+  import ContactCard from '@/components/Common/ContactCard.vue'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
   import { useBankAccountsStore, useCardsStore, useContactsStore } from '@/stores'
@@ -68,18 +68,25 @@
     }))
   )
 
-  const paymentOptions = computed<SelectGroupOption[]>(() => [
-    {
-      type: 'group',
-      groupTitle: 'Credit/debit cards',
-      options: cardsStore.map((item) => ({ title: item.fullName, value: item.id })),
-    },
-    {
-      type: 'group',
-      groupTitle: 'Bank accounts',
-      options: bankAccountsStore.map((item) => ({ title: item.accountName, value: item.id })),
-    },
-  ])
+  const paymentOptions = computed<SelectGroupOption[]>(() => {
+    const options = []
+
+    if (!isEmpty(cardsStore)) {
+      options.push({
+        groupTitle: 'Credit/debit cards',
+        options: cardsStore.map((item) => ({ title: item.fullName, value: item.id })),
+      })
+    }
+
+    if (!isEmpty(bankAccountsStore)) {
+      options.push({
+        groupTitle: 'Bank accounts',
+        options: bankAccountsStore.map((item) => ({ title: item.accountName, value: item.id })),
+      })
+    }
+
+    return options
+  })
 
   function removeItem(type: keyof PayFormValues, id: number) {
     if (payFormDraft[type] === id) {
@@ -131,7 +138,7 @@
         </div>
       </template>
       <template v-slot:optionItem="data">
-        <ContactsListItem
+        <ContactCard
           :slot-data="data"
           :contact="getItemById(contactsStore, data.item.value)"
           @delete="(v) => removeItem('recipient', v)"
@@ -162,7 +169,7 @@
         <div class="text-gray-400 text-xs">{{ getCardNumber(item.value) }}</div>
       </template>
       <template v-slot:optionItem="data">
-        <PaymentMethodsListItem
+        <PaymentMethodCard
           class="mb-4"
           :slot-data="data"
           :card="getItemById([...cardsStore, ...bankAccountsStore], data.item.value)"
@@ -178,7 +185,7 @@
         </div>
       </template>
     </AppSelect>
-    <FormInput
+    <AppInput
       class="mb-8"
       type="number"
       label="Amount"

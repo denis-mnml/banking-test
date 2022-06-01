@@ -27,7 +27,7 @@ export type Card = {
 export type BankAccount = {
   id: number
   accountName: string
-  accountNumber: string
+  accountNumber: number
   bsb: string
 }
 

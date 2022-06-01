@@ -25,12 +25,10 @@
     error?: boolean
     helpText?: string
     mask?: keyof typeof maskTypes
+    maxlength?: number
   }>()
 
-  const localValue = computed(() => {
-    console.log('computed', props.value || props.modelValue)
-    return maskValue(props.value || props.modelValue)
-  })
+  const localValue = computed(() => maskValue(props.value || props.modelValue))
 
   const emit = defineEmits<{
     (e: 'update:modelValue', value: string): void
@@ -63,7 +61,7 @@
       :class="{ 'form-input_error': error }"
       :name="name"
       :value="localValue"
-      :maxlength="mask && maskTypes[mask].length"
+      :maxlength="maxlength || (mask && maskTypes[mask].length)"
       :placeholder="placeholder"
       @input="inputHandler"
     />

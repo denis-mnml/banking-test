@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import PageHeader from '@/components/Common/PageHeader.vue'
-  import PaymentForm from '@/components/Payment/PaymentForm.vue'
+  import PaymentForm from '@/components/Forms/PaymentForm.vue'
 </script>
 
 <template>

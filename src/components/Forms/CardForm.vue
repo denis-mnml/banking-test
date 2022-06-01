@@ -4,7 +4,7 @@
   import useLocalStorage from '@/hooks/useLocalStorage'
   import { useField, useForm } from 'vee-validate'
   import * as yup from 'yup'
-  import FormInput from '@/components/Form/FormInput.vue'
+  import AppInput from '@/components/Ui/AppInput.vue'
   import AppButton from '@/components/Ui/AppButton.vue'
   import { Card } from '@/types'
   import { useCardsStore } from '@/stores'
@@ -113,7 +113,7 @@
 
 <template>
   <form class="flex flex-col grow" autocomplete="off" @submit.prevent="onSubmit" @input="onInput">
-    <FormInput
+    <AppInput
       class="mb-6"
       label="Full Name"
       name="fullName"
@@ -122,7 +122,7 @@
       :help-text="fullNameError"
       v-model="fullName"
     />
-    <FormInput
+    <AppInput
       class="mb-6"
       label="Card Number"
       name="cardNumber"
@@ -133,7 +133,7 @@
       :help-text="cardNumberError"
       v-model="cardNumber"
     />
-    <FormInput
+    <AppInput
       class="mb-6"
       label="Expiry date"
       name="expiryDate"

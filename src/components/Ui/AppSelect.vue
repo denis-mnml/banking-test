@@ -94,9 +94,14 @@
               <XIcon size="20" class="-my-1 text-gray-400" @click="close" />
             </div>
             <div class="drawer__content no-scrollbar">
-              <ul class="drawer__list" v-for="(item, index) in optionsList" :key="item.groupTitle">
+              <ul
+                v-for="(item, index) in optionsList"
+                :key="item.groupTitle"
+                class="drawer__list"
+                :class="{ 'mb-8': index !== optionsList.length - 1 }"
+              >
                 <template v-if="item.options.length">
-                  <li v-if="item.groupTitle" class="drawer__list-title" :class="{ 'mt-8': index !== 0 }">
+                  <li v-if="item.groupTitle" class="drawer__list-title">
                     {{ item.groupTitle }}
                   </li>
                   <TransitionGroup name="delete" @before-leave="beforeLeave">
