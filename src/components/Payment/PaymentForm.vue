@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed, ref, watch } from 'vue'
   import useLocalStorage from '@/hooks/useLocalStorage'
-  import { BankAccount, Card, Contact, SelectGroupOptions, SelectOption } from '@/types'
+  import { BankAccount, Card, Contact, SelectGroupOption, SelectOption } from '@/types'
   import { getProtectedCardNumber } from '@/utils'
   import FormInput from '@/components/Form/FormInput.vue'
   import AppButton from '@/components/Ui/AppButton.vue'
@@ -29,48 +29,56 @@
   // FORM
   const { handleSubmit, handleReset, setValues } = useForm({
     initialValues: {
-      ...payFormDraft
+      ...payFormDraft,
     },
     validationSchema: yup.object({
       recipient: yup.number().required().label('Last name'),
       method: yup.number().required().label('Payment method'),
-      amount: yup.number().typeError('Amount is a required field').required().label('Amount')
-    })
+      amount: yup.number().typeError('Amount is a required field').required().label('Amount'),
+    }),
   })
 
-  const { value: recipient, errorMessage: recipientError, resetField: resetRecipient } = useField('recipient')
-  const { value: method, errorMessage: methodError, resetField: resetMethod } = useField('method')
-  const { value: amount, errorMessage: amountError } = useField('amount')
+  const {
+    value: recipient,
+    errorMessage: recipientError,
+    resetField: resetRecipient,
+  } = useField<number | undefined>('recipient')
+  const { value: method, errorMessage: methodError, resetField: resetMethod } = useField<number | undefined>('method')
+  const { value: amount, errorMessage: amountError } = useField<number | undefined>('amount')
 
   const onSubmit = handleSubmit(() => {
     handleReset()
     destroyPayFormDraft()
   })
 
-  const onInput = (e: InputEvent) => {
+  const onInput = (e: Event) => {
     const name = (e.target as HTMLInputElement).name as keyof PayFormValues
     const value = parseInt((e.target as HTMLInputElement).value)
     payFormDraft[name] = value
   }
 
-  const onChangeSelect = (key: keyof PayFormValues, value: number) => {
-    if (value) payFormDraft[key] = value
+  const onChangeSelect = (key: keyof PayFormValues, value: string | number) => {
+    if (value) payFormDraft[key] = Number(value)
   }
 
-  const contactOptions = computed<SelectOption[]>(() => contactsStore.map((item) => ({
-    title: `${item.firstName} ${item.lastName}`,
-    value: item.id
-  })))
+  const contactOptions = computed<SelectOption[]>(() =>
+    contactsStore.map((item) => ({
+      title: `${item.firstName} ${item.lastName}`,
+      value: item.id,
+    }))
+  )
 
-  const paymentOptions = computed<SelectGroupOptions[]>(() => [
+  const paymentOptions = computed<SelectGroupOption[]>(() => [
     {
+      type: 'group',
       groupTitle: 'Credit/debit cards',
-      options: cardsStore.map((item) => ({ title: item.fullName, value: item.id }))
+      options: cardsStore.map((item) => ({ title: item.fullName, value: item.id })),
     },
     {
+      type: 'group',
       groupTitle: 'Bank accounts',
-      options: bankAccountsStore.map((item) => ({ title: item.accountName, value: item.id }))
-    }
+      options: bankAccountsStore.map((item) => ({ title: item.accountName, value: item.id })),
+    },
   ])
 
   function removeItem(type: keyof PayFormValues, id: number) {
@@ -83,17 +91,17 @@
   }
 
   function getItemById<T extends { id: number }>(items: T[], id: number) {
-    return items.find((item) => item.id === id)
+    return items.find((item) => item.id === id) as T
   }
 
   function getContactEmail(value: number) {
-    const item = getItemById<Contact>(contactsStore, value) as Contact
+    const item = getItemById<Contact>(contactsStore, value)
     return item?.email || ''
   }
 
   function getCardNumber(value: number) {
-    const item = getItemById<Card | BankAccount>([...cardsStore, ...bankAccountsStore], value) as Card
-    return item ? getProtectedCardNumber(item) : ''
+    const item = getItemById<Card | BankAccount>([...cardsStore, ...bankAccountsStore], value)
+    return getProtectedCardNumber(item)
   }
 </script>
 
@@ -138,16 +146,16 @@
     </AppSelect>
     <AppSelect
       class="mb-6"
-      :options="paymentOptions"
       label="Payment Method"
       placeholder="Select method"
+      :options="paymentOptions"
       :error="!!methodError"
       :help-text="methodError"
       v-model="method"
       @change="(v) => onChangeSelect('method', v)"
     >
       <template #action>
-        <router-link :to="{ name: 'PaymentMethods' }" class="text-sm font-semibold text-blue-600"> + Add</router-link>
+        <router-link :to="{ name: 'PaymentMethods' }" class="text-sm font-semibold text-blue-600">+ Add</router-link>
       </template>
       <template v-slot:selectedView="{ item }">
         <div class="font-bold text-gray-900 text-sm">{{ item.title }}</div>
@@ -180,6 +188,6 @@
       :help-text="amountError"
       v-model="amount"
     />
-    <AppButton class="mt-auto w-full" html-type="submit" type="primary" :loading="isLoading"> Pay</AppButton>
+    <AppButton class="mt-auto w-full" html-type="submit" type="primary" :loading="isLoading">Pay</AppButton>
   </form>
 </template>

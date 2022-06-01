@@ -40,9 +40,9 @@
     })
   })
 
-  const { value: firstName, errorMessage: firstNameError } = useField('firstName')
-  const { value: lastName, errorMessage: lastNameError } = useField('lastName')
-  const { value: email, errorMessage: emailError } = useField('email')
+  const { value: firstName, errorMessage: firstNameError } = useField<string | undefined>('firstName')
+  const { value: lastName, errorMessage: lastNameError } = useField<string | undefined>('lastName')
+  const { value: email, errorMessage: emailError } = useField<string | undefined>('email')
 
   const onSubmit = handleSubmit((values) => {
     if (isEdit.value) {
@@ -66,7 +66,7 @@
     destroyContactFormDraft()
   })
 
-  const onInput = (e: InputEvent) => {
+  const onInput = (e: Event) => {
     if (!isEdit.value) {
       const name = (e.target as HTMLInputElement).name as keyof ContactFormValues
       contactFormDraft[name] = (e.target as HTMLInputElement).value

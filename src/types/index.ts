@@ -36,7 +36,7 @@ export interface SelectOption {
   value: string | number
 }
 
-export interface SelectGroupOptions {
+export interface SelectGroupOption {
   groupTitle: string
   options: SelectOption[]
 }

@@ -3,7 +3,7 @@
 
   const props = defineProps<{
     test?: string
-    htmlType?: string
+    htmlType?: 'button' | 'submit' | 'reset' | undefined
     type?: string
     loading?: boolean
     disabled?: boolean

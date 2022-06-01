@@ -5,18 +5,18 @@
   const maskTypes = {
     expiry: '00/00',
     card: '0000 0000 0000 0000',
-    bsb: '000-000'
+    bsb: '000-000',
   }
 
   const removeFromMask = {
     expiry: '/',
     card: ' ',
-    bsb: '-'
+    bsb: '-',
   }
 
   const props = defineProps<{
-    type?: string
-    inputmode?: string
+    type?: 'email' | 'hidden' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
+    inputmode?: 'search' | 'text' | 'email' | 'none' | 'tel' | 'url' | 'numeric' | 'decimal'
     label?: string
     name: string
     placeholder?: string

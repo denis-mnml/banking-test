@@ -1,0 +1,9 @@
+.tabs {
+  @apply flex items-center p-1.5 bg-gray-100 rounded-lg;
+  &__item {
+    @apply basis-1/2 py-1 px-2 text-gray-500 text-sm text-center font-semibold;
+    &_active {
+      @apply text-gray-900 bg-white shadow-md rounded-md;
+    }
+  }
+}

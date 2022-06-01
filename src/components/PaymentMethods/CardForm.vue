@@ -14,10 +14,8 @@
   const router = useRouter()
   const route = useRoute()
 
-  const {
-    storage: cardFormDraft,
-    destroyStorage: destroyCardFormDraft
-  } = useLocalStorage<Partial<CardFormValues>>('cardFormDraft')
+  const { storage: cardFormDraft, destroyStorage: destroyCardFormDraft } =
+    useLocalStorage<Partial<CardFormValues>>('cardFormDraft')
   const { storage: cardsStore } = useCardsStore()
 
   const cardToEdit = computed(() => {
@@ -32,49 +30,61 @@
   const { handleSubmit, handleReset } = useForm({
     initialValues: {
       ...cardFormDraft,
-      ...cardToEdit.value
+      ...cardToEdit.value,
     },
     validationSchema: yup.object({
       fullName: yup.string().required().max(30).label('Full name'),
-      cardNumber: yup.string().required().label('Card number')
-                     .test('test-number', 'Card number must contain 16 digits', (value) => (value && value?.length === 19) as boolean),
-      expiryDate: yup.string().required().label('Expiry date')
-                     .test('test-expiry', 'Expiry date is incorrect', (value) => {
-                       if (value && value.length === 5) {
-                         const [month, year] = value.split('/')
-                         const currentYear = new Date().getFullYear()
-                         const currentMonth = new Date().getMonth() + 1
-                         return Number(month) > currentMonth
-                           && Number(month) <= 12
-                           && Number('20' + year) >= currentYear
-                           && Number('20' + year) <= currentYear + 3
-                       }
+      cardNumber: yup
+        .string()
+        .required()
+        .label('Card number')
+        .test(
+          'test-number',
+          'Card number must contain 16 digits',
+          (value) => (value && value?.length === 19) as boolean
+        ),
+      expiryDate: yup
+        .string()
+        .required()
+        .label('Expiry date')
+        .test('test-expiry', 'Expiry date is incorrect', (value) => {
+          if (value && value.length === 5) {
+            const [month, year] = value.split('/')
+            const currentYear = new Date().getFullYear()
+            const currentMonth = new Date().getMonth() + 1
+            return (
+              Number(month) > currentMonth &&
+              Number(month) <= 12 &&
+              Number('20' + year) >= currentYear &&
+              Number('20' + year) <= currentYear + 3
+            )
+          }
 
-                       return false
-                     })
-    })
+          return false
+        }),
+    }),
   })
 
-  const { value: fullName, errorMessage: fullNameError } = useField('fullName')
-  const { value: cardNumber, errorMessage: cardNumberError } = useField('cardNumber')
-  const { value: expiryDate, errorMessage: expiryDateError } = useField('expiryDate')
+  const { value: fullName, errorMessage: fullNameError } = useField<string | undefined>('fullName')
+  const { value: cardNumber, errorMessage: cardNumberError } = useField<string | undefined>('cardNumber')
+  const { value: expiryDate, errorMessage: expiryDateError } = useField<string | undefined>('expiryDate')
 
   const onSubmit = handleSubmit((values) => {
     console.log('Add card', values, isEdit.value)
     if (isEdit.value) {
       const card = cardToEdit.value as Card
-      const idx = cardsStore.findIndex(item => item.id === card.id)
+      const idx = cardsStore.findIndex((item) => item.id === card.id)
 
       if (idx !== -1) {
         cardsStore[idx] = {
           ...card,
-          ...values
+          ...values,
         }
       }
     } else {
       cardsStore.push({
         id: Date.now(),
-        ...values as CardFormValues
+        ...(values as CardFormValues),
       })
     }
 
@@ -82,7 +92,7 @@
     destroyCardFormDraft()
   })
 
-  const onInput = (e: InputEvent) => {
+  const onInput = (e: Event) => {
     if (!isEdit.value) {
       const name = (e.target as HTMLInputElement).name as keyof CardFormValues
       const value = (e.target as HTMLInputElement).value
@@ -97,7 +107,7 @@
   }
 
   defineExpose({
-    resetForm
+    resetForm,
   })
 </script>
 

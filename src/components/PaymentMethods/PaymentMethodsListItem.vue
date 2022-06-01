@@ -24,13 +24,13 @@
   const { storage: bankAccountsStore } = useBankAccountsStore()
 
   const cardType = 'cardNumber' in props.card ? 'card' : 'bankAccount'
+  const cardNumber = 'fullName' in props.card ? props.card.fullName : props.card.accountName
+  const cardExpiry = 'expiryDate' in props.card ? props.card.expiryDate : ''
   const cardImgSrc = computed(() => {
     let type = 'bank'
 
     if ('cardNumber' in props.card) {
-      type = parseInt(props.card.cardNumber.toString().charAt(0)) > 5
-        ? 'mastercard'
-        : 'visa'
+      type = parseInt(props.card.cardNumber.toString().charAt(0)) > 5 ? 'mastercard' : 'visa'
     }
 
     return `@/assets/img/${type}.svg`
@@ -38,9 +38,8 @@
 
   const to = ref({
     name: 'EditPaymentMethod',
-    params: { id: props.card.id }
+    params: { id: props.card.id },
   })
-
 
   function removeItem() {
     const storage = eval(cardType === 'card' ? 'cardsStore' : 'bankAccountsStore') as Card[] | BankAccount[]
@@ -49,22 +48,13 @@
       storage.splice(idx, 1)
       emit('delete', props.card.id)
     }
-
-    // if (cardType === 'card') {
-    //   const idx = cardsStore.findIndex((item) => item.id === props.card.id)
-    //   if (idx !== -1) cardsStore.splice(idx, 1)
-    // } else {
-    //   const idx = bankAccountsStore.findIndex((item) => item.id === props.card.id)
-    //   if (idx !== -1) bankAccountsStore.splice(idx, 1)
-    // }
   }
-
 </script>
 
 <template>
   <div class="w-full p-4 rounded-xl shadow-[0_2px_6px_0_rgba(0,0,0,0.1)]">
     <div class="flex justify-between mb-4">
-      <img :src="cardImgSrc" class="block max-w-full h-6" alt="Card type">
+      <img :src="cardImgSrc" class="block max-w-full h-6" alt="Card type" />
       <Dropdown class="mt-1 ml-auto">
         <template #trigger>
           <DotsVerticalIcon size="20" class="text-gray-400" />
@@ -78,17 +68,15 @@
     <div class="flex items-center mb-2">
       <div
         :class="slotData.isSelected ? 'bg-green-600' : 'bg-gray-200'"
-        class="flex items-center justify-center h-5 min-w-[1.25rem] basis-5 mr-2  text-white rounded-full"
+        class="flex items-center justify-center h-5 min-w-[1.25rem] basis-5 mr-2 text-white rounded-full"
       >
         <CheckIcon v-if="slotData.isSelected" size="12" />
       </div>
-      <div class="font-bold text-gray-800">{{ card.fullName || card.accountName }}</div>
+      <div class="font-bold text-gray-800">{{ cardNumber }}</div>
     </div>
     <div class="flex justify-between">
       <div class="text-gray-400 text-sm">{{ getProtectedCardNumber(card) }}</div>
-      <div class="text-gray-400 text-sm" v-if="card.expiryDate">
-        {{ card.expiryDate }}
-      </div>
+      <div class="text-gray-400 text-sm" v-if="cardExpiry">{{ cardExpiry }}</div>
     </div>
   </div>
 </template>
