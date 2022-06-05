@@ -46,7 +46,7 @@
   })
 
   function removeItem() {
-    const storage = eval(cardType === 'card' ? 'cardsStore' : 'bankAccountsStore') as Card[] | BankAccount[]
+    const storage = cardType === 'card' ? cardsStore : bankAccountsStore
     const idx = storage.findIndex((item) => item.id === props.card.id)
     if (idx !== -1) {
       storage.splice(idx, 1)
